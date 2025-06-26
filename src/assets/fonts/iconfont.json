@@ -1,0 +1,23 @@
+{
+  "id": "",
+  "name": "",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "1727516",
+      "name": "303正确、完成-圆框",
+      "font_class": "zhengquewancheng-yuankuang",
+      "unicode": "e8e4",
+      "unicode_decimal": 59620
+    },
+    {
+      "icon_id": "1727521",
+      "name": "304错误、关闭、取消-圆框",
+      "font_class": "cuowuguanbiquxiao-yuankuang",
+      "unicode": "e8e7",
+      "unicode_decimal": 59623
+    }
+  ]
+}
