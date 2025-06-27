@@ -51,17 +51,13 @@
       <van-button 
         class="bottombut-inner" 
         type="primary" 
-        size="large"
-        @click="showPopup"
-      >Comfrim</van-button>
+        size="large" 
+        @click="showPopupContent">Comfrim
+      </van-button>
     </div>
 
-    <!-- <van-cell title="展示弹出层" is-link @click="showPopup" /> -->
-    <van-popup 
-      v-model:show="show" 
-      :style="{ padding: '64px' }"
-      class="popup-containter"
-    >内容</van-popup>
+    <!-- 展示弹出层 -->
+    <showPopup v-model="showPopupData" :showobj="showobj"></showPopup>
 
     <!-- 蒙版alert -->
     <div class="transfer-container-alert" v-if="false">
@@ -85,19 +81,47 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, toRefs, onMounted } from 'vue'
+import axios from 'axios'
+import { ref, reactive } from 'vue'
 import showToast from './TransferCpns/showToast.vue'
+import showPopup from './TransferCpns/showPopup.vue'
 let showAlert = ref(false)
-let show = ref(false)
+let showPopupData = ref(false)
+let showobj = reactive({})
+let showPop = reactive([])
+
+function requestShowData() {
+  axios.get('/show/showPop').then(res => {
+    showPop = res.data.data
+  }).catch(error => {
+    console.log(error);
+  })
+}
+requestShowData()
+
+function showPopupContent() {
+  showobj = showPop.filter(item => item.show === true)[0]
+  console.log('22222222', showobj);
+  
+  showPopupData.value = showPop.filter(item => item.show === true)[0].show
+  console.log(showPopupData);
+}
+
+// watch(showobj, (newVal, oldVal) => {
+//   console.log(newVal, oldVal);
+// }, {
+//   deep: true
+// })
+
+
 
 // 按确认展示提示
 function showTip() {
   // showAlert.value = !showAlert.value
 }
 
-function showPopup() {
-  show.value = true
-}
+
+
 
 
 </script>
@@ -106,6 +130,7 @@ function showPopup() {
   display: flex;
   flex-direction: column;
 }
+
 /* 蒙层 */
 .transfer-container-alert {
   background-color: rgba(225, 225, 225, 0.7);
@@ -113,6 +138,7 @@ function showPopup() {
   position: absolute;
   height: 100%;
 }
+
 .transfer-container-alert-container {
   background-color: #000;
   padding: 5px;
@@ -121,10 +147,12 @@ function showPopup() {
   margin-left: 80px;
   border-radius: 10px 0 0 10px;
 }
+
 .transfer-container-alert-container .right {
   color: #3dc55d;
   margin-right: 8px;
 }
+
 .transfer-container-alert-container .fault {
   color: #f00;
   margin-right: 8px;
@@ -136,6 +164,7 @@ function showPopup() {
   font-weight: 455;
   margin: 10px 10px 0 10px;
 }
+
 .transfer-window {
   margin: 10px;
   height: 300px;
@@ -145,28 +174,33 @@ function showPopup() {
   flex-direction: column;
   justify-content: space-between;
 }
-.transfer-front, .transfer-behind {
+
+.transfer-front,
+.transfer-behind {
   padding: 15px;
 }
-.transfer-front select, .transfer-behind select {
+
+.transfer-front select,
+.transfer-behind select {
   width: 140px;
   height: 40px;
   margin-right: 10px;
   border-radius: 10px;
 }
-.transfer-front input, .transfer-behind input {
+
+.transfer-front input,
+.transfer-behind input {
   width: 170px;
   height: 40px;
   border-radius: 10px;
   border: 0;
 }
-.transfer-front input::placeholder, .transfer-behind input::placeholder {
-  padding-left:3px;
+
+.transfer-front input::placeholder,
+.transfer-behind input::placeholder {
+  padding-left: 3px;
 }
-.transfer-front input:focus, .transfer-behind input:focus {
-  /* border-color: #1989fa; */
-  /* border: 1px solid #1989fa; */
-}
+
 .transfer-middle {
   display: flex;
   flex-direction: column;
@@ -174,6 +208,7 @@ function showPopup() {
   padding: 0 15px;
   margin-top: -40px;
 }
+
 .transfer-middle-alert {
   margin-top: 25px;
   background-color: #000;
@@ -181,14 +216,17 @@ function showPopup() {
   padding: 5px;
   border-radius: 10px 0 0 10px;
 }
+
 .transfer-middle-alert::before {
   content: '*';
   color: red;
   padding-right: 3px;
 }
+
 .transfer-available {
   color: #fff;
 }
+
 .transfer-div {
   width: 100px;
   height: 100px;
@@ -200,36 +238,80 @@ function showPopup() {
   transform: translateX(110px);
   box-shadow: 0 5px 5px 1px #1166cb;
 }
-.transfer-div img { 
+
+.transfer-div img {
   width: 40px;
   height: 40px;
 }
+
 .transfer-div img:nth-child(1) {
   margin-right: -10px;
 }
+
 .transfer-div img:nth-child(2) {
   margin-left: -10px;
 }
+
 .bottombut {
   text-align: center;
   bottom: 15px;
   position: fixed;
   width: 100%;
 }
+
 .bottombut-inner {
   border-radius: 20px;
   width: 80%;
   box-shadow: 0 5px 5px 1px #cbcbcb;
 }
 
+
+
+
+
+
+
+
 .popup-containter {
   bottom: 0;
   text-align: center;
-  /* top: 0; */
   width: auto;
   transform: translateY(0);
+  box-shadow: 0 5px 5px 1px #cbcbcb;
+  padding: 0;
 }
-.van-overflow-hidden {
-  overflow: visible !important;
+.popup-containter-inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.popup-containter-inner-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+.popup-containter-inner-img {
+  width: 94px;
+  height: 94px;
+}
+.popup-containter-but {
+  bottom: 25px;
+  position: fixed;
+  width: 65%;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #1989fa;
+  color: #fff;
+  box-shadow: 0 5px 5px 1px #d6d6d6;
+}
+.popup-containter-inner-title {
+  font-size: 25px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.van-overlay {
+  background: rgba(0, 0, 0, 0);
 }
 </style>

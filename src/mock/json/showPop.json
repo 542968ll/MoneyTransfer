@@ -1,0 +1,25 @@
+{
+  "status": 0,
+  "data": [
+    {
+      "show": false,
+      "img": "../../assets/image/fadai.svg",
+      "title": "Convert Failed!",
+      "text": "Incorrect trade password.",
+      "but": "Try Again"
+    }, {
+      "show": true,
+      "img": "../../assets/image/guzhang.svg",
+      "title": "Convert Successfully!",
+      "text": "You have converted 0.01 BTC to 1.234 ETH,please review soon.",
+      "but": "Review"
+    }, {
+      "show": false,
+      "img": "../../assets/image/xiaolian.svg",
+      "title": "Quote Expired!",
+      "text": "Please request for a new quote.",
+      "but": "Refres"
+    }
+  ],
+  "msg": ""
+}
