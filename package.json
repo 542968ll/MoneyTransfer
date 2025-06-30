@@ -9,9 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.1.10",
+    "@tailwindcss/vite": "^4.1.11",
     "qs": "^6.14.0",
-    "tailwindcss": "^4.1.10",
+    "tailwindcss": "^4.1.11",
     "vant": "^4.9.20",
     "vue": "^3.5.17"
   },
@@ -19,6 +19,7 @@
     "@vitejs/plugin-vue": "^6.0.0",
     "@vue/tsconfig": "^0.7.0",
     "axios": "^1.10.0",
+    "pinia": "^3.0.3",
     "sass-embedded": "^1.89.2",
     "typescript": "~5.8.3",
     "vite": "^5.2.0",

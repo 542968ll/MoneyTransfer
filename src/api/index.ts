@@ -3,10 +3,12 @@ import serverConfig from './config';
 import qs from 'qs';
 
 const instance = axios.create({
-    baseURL: 'http://localhost:5173/api',
-    timeout: 10000,
-    withCredentials: false
+  baseURL: 'http://localhost:5173/api',
+  timeout: 10000,
+  withCredentials: false
 });
+
+
 
 // 创建请求拦截
 instance.interceptors.request.use(
@@ -91,4 +93,11 @@ instance.interceptors.response.use(
     return Promise.reject(message);
   }
 );
-export default instance;
+
+
+// API方法封装
+export const fetchShowPopup = () => instance.get('/users')
+export const fetchCurrencies = () => instance.get('/currencies')
+export const convertCurrency = (userData) => instance.post('/convert', userData)
+
+export default instance

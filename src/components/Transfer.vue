@@ -1,69 +1,95 @@
 <template>
-  <div class="transfer-container">
-    <!-- 标题 -->
-    <div class="transfer-title">Convert</div>
-    <!-- 转换窗口 -->
-    <div class="transfer-window">
-      <!-- 选择货币&显示金额 -->
-      <div class="transfer-front">
+  <!-- transfer-container -->
+  <div class="flex flex-col">
+    <!-- 标题 transfer-title -->
+    <div class="fontSize-[23px] font-normal mx-[10px] mt-[10px] mb-[0px]">Convert</div>
+    <!-- 转换窗口 transfer-window -->
+    <div class="m-[10px] h-[300px] rounded-[20px] bg-[#1989fa] flex flex-col justify-between">
+      <!-- 选择货币&显示金额 transfer-front -->
+      <!-- [&>*]: -->
+      <div class="p-[15px]
+        transfer-front
+      ">
         <!-- 选择框 -->
-        <select name="Money" id="">
-          <option value="BTC">BTC</option>
-          <option value="BTC">BTC</option>
-          <option value="BTC">BTC</option>
-          <option value="BTC">BTC</option>
-          <option value="BTC">BTC</option>
+        <select name="Money" v-model="from" @change="handleSubmit()">
+          <option value="USD">USD</option>
         </select>
-        <input type="text" placeholder="Amount">
+        <input type="text" placeholder="Amount" v-model="amount" @input="handleSubmit()">
       </div>
 
-      <div class="transfer-middle">
+      <!-- transfer-middle -->
+      <div class="flex flex-col justify-center py-[0px] px-[15px] -mt-[40px]">
         <!-- 有个判断需alert -->
-        <div v-if="showAlert" class="transfer-middle-alert">Insufficient funds.</div>
+        <!-- transfer-middle-alert -->
+        <!-- mt-6 bg-black text-white p-1 -->
+        <div v-if="showAlert" class="
+          mt-[25px]
+          bg-[#000]
+          text-[#fff]
+          p-[5px]
+          rounded-tl-['10px']
+          before:content-['*']
+          before:text-['red']
+          before:pr-[3px]
+        ">Insufficient funds.</div>
+        <div v-if="showLimitAlert" class="transfer-middle-alert">Amount exceeds limit.</div>
         <!-- 显示available -->
-        <div class="transfer-available">
+        <div class="text-[#fff]">
           <p>Available:</p>
-          <p>100.0121</p>
+          <p>{{ available }}</p>
         </div>
-        <!-- 交换上下文 -->
-        <div class="transfer-div">
-          <img src="../assets/image/upArrow.svg" alt="">
-          <img src="../assets/image/downArrow.svg" alt="">
+        <!-- 交换上下文 transfer-div -->
+        <div class="
+          w-[100px]
+          h-[100px]
+          rounded-[50%]
+          bg-[#fff]
+          flex
+          justify-center
+          items-center
+          translate-x-[110px]
+          boxShadow-3xl
+        " @click="transferBut">
+          <img src="../assets/image/upArrow.svg" alt="" class="w-[40px] h-[40px] -mr-[10px]">
+          <img src="../assets/image/downArrow.svg" alt="" class="w-[40px] h-[40px] -ml-[10px]">
         </div>
       </div>
 
       <!-- 选择货币&显示金额 -->
-      <div class="transfer-behind">
+      <div class="p-[15px]
+        transfer-behind
+      ">
         <!-- 选择框 -->
-        <select name="Money" id="">
-          <option value="ETH">ETH</option>
-          <option value="ETH">ETH</option>
-          <option value="ETH">ETH</option>
-          <option value="ETH">ETH</option>
-          <option value="ETH">ETH</option>
+        <select name="Money" @change="handleSubmit()" v-model="to">
+          <option value="USD">USD</option>
+          <option value="CNY">CNY</option>
+          <option value="HKD">HKD</option>
+          <option value="EUR">EUR</option>
+          <option value="JPY">JPY</option>
+          <option value="MOP">MOP</option>
         </select>
-        <input type="text" placeholder="Amount">
+        <input type="text" placeholder="Amount" v-model="result">
       </div>
     </div>
 
-    <!-- 确认按钮 -->
-    <div class="bottombut">
+    <!-- 确认按钮 bottombut -->
+    <div class="text-center fixed w-full bottom-[15px]">
+      <!-- bottombut-inner -->
       <van-button 
-        class="bottombut-inner" 
+        class="rounded-2xl w-10/12 shadow-[0_5px_5px_1px_#cbcbcb]" 
         type="primary" 
-        size="large" 
-        @click="showPopupContent">Comfrim
+        @click="confirmShowPop">Comfrim
       </van-button>
     </div>
 
     <!-- 展示弹出层 -->
     <showPopup v-model="showPopupData" :showobj="showobj"></showPopup>
 
-    <!-- 蒙版alert -->
-    <div class="transfer-container-alert" v-if="false">
-      <!-- 显示错误 | 正确提示 -->
+    <!-- 蒙版alert transfer-container-alert-->
+    <div class="bg-[#1989fa]-[0.6] w-full absolute h-full" v-if="false">
+      <!-- 显示错误 | 正确提示 transfer-container-alert-container -->
       <template v-if="false">
-        <div class="transfer-container-alert-container">
+        <div class="bg-black p-1.5 text-white mt-20 ml-20">
           <span class="iconfont right">&#xe8e4;</span>
           <span>Modified successfully.</span>
         </div>
@@ -81,37 +107,71 @@
 </template>
 
 <script setup lang="ts">
-import axios from 'axios'
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import showToast from './TransferCpns/showToast.vue'
 import showPopup from './TransferCpns/showPopup.vue'
-let showAlert = ref(false)
+import { useCurrencyStore } from "../store/currency"
+import { useShowPopupStore } from "../store/showPopup";
+import { computed } from '@vue/reactivity';
+
 let showPopupData = ref(false)
-let showobj = reactive({})
-let showPop = reactive([])
+let showobj = reactive({
+  "show": true,
+  "img": "../../assets/image/fadai.svg",
+  "title": "Convert Failed!",
+  "text": "Incorrect trade password.",
+  "but": "Try Again"
+})
 
-function requestShowData() {
-  axios.get('/show/showPop').then(res => {
-    showPop = res.data.data
-  }).catch(error => {
-    console.log(error);
-  })
+let amount = ref(1)
+let from = ref("USD")
+let to = ref("CNY")
+let result = ref(6.45)
+let available = ref(100.0121)
+let amountLimit = ref(1)
+
+const currencyStore = useCurrencyStore()
+const showStore = useShowPopupStore()
+
+
+const showAlert = computed(()=> {
+  return amount.value > available.value
+})
+const showLimitAlert = computed(() => {
+  return amount.value < amountLimit.value
+})
+
+const handleSubmit = async () => {
+  try {
+    const conversion = await currencyStore.convert(
+      from.value, 
+      to.value, 
+      amount.value
+    )
+    result.value = conversion.result
+  } finally { }
 }
-requestShowData()
 
-function showPopupContent() {
-  showobj = showPop.filter(item => item.show === true)[0]
-  console.log('22222222', showobj);
+const confirmShowPop = async () => {
+  try {
+    const showList = await showStore.showPopupList()
+    showobj = showList.filter(item => item.show === true)[0]
+    showPopupData.value = showList.filter(item => item.show === true)[0].show
+    return showList
+  } finally { }
+}
+
+
+const transferBut = () => {
+  // console.log("66666666");
+  // [from.value, to.value] = [to.value, from.value]
+  // console.log(from.value, to.value);
+  alert("暂不支持转换功能~")
   
-  showPopupData.value = showPop.filter(item => item.show === true)[0].show
-  console.log(showPopupData);
+  // [amount.value, result.value] = [result.value, amount.value]
 }
 
-// watch(showobj, (newVal, oldVal) => {
-//   console.log(newVal, oldVal);
-// }, {
-//   deep: true
-// })
+
 
 
 
@@ -122,9 +182,10 @@ function showTip() {
 
 
 
-
-
 </script>
+
+
+
 <style scoped>
 .transfer-container {
   display: flex;

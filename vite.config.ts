@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
 import { viteMockServe } from "vite-plugin-mock";
+import {  } from "./src/api/index";
 import path from 'path'
 
 // https://vite.dev/config/
@@ -22,7 +23,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target:  'http://localhost:5173/',
+        target: 'http://localhost', // 代理目标
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }

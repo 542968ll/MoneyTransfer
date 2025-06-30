@@ -22,19 +22,15 @@
 
 <script setup lang="ts">
 import { ref, reactive, toRefs, onMounted, computed } from 'vue'
-// interface TProps {
-//   show: boolean,
-//   img: string,
-//   title: string,
-//   text: string,
-//   but: str
-// }
+
 const props = defineProps({
   showobj: {
     type: Object,
   }
 })
 const { img, title, text, but } = props.showobj
+
+
 const image = new URL(img, import.meta.url).href
 
 

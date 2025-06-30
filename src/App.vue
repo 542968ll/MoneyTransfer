@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
 import Transfer from './components/Transfer.vue';
-
 
 
 </script>
@@ -9,6 +7,9 @@ import Transfer from './components/Transfer.vue';
 <template>
   <Transfer></Transfer>
 </template>
+
+
+
 
 <style scoped>
 
