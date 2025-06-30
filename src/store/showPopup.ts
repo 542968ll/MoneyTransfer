@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import {  fetchShowPopup } from '../api/show'
+import { fetchShowPopup } from '../api/show'
 
 interface showPopup {
   show: boolean,

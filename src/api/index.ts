@@ -3,12 +3,10 @@ import serverConfig from './config';
 import qs from 'qs';
 
 const instance = axios.create({
-  baseURL: 'http://localhost:5173/api',
-  timeout: 10000,
+  baseURL: '/api',
+  timeout: 5000,
   withCredentials: false
 });
-
-
 
 // 创建请求拦截
 instance.interceptors.request.use(
@@ -20,8 +18,8 @@ instance.interceptors.request.use(
     // 设置请求头
     if(!config.headers["content-type"]) { // 如果没有设置请求头
       if(config.method === 'post') {
-        config.headers["content-type"] = "application/x-www-form-urlencoded"; // post 请求
-        config.data = qs.stringify(config.data); // 序列化,比如表单数据
+        // config.headers["content-type"] = "application/x-www-form-urlencoded"; // post 请求
+        // config.data = qs.stringify(config.data); // 序列化,比如表单数据
       } else {
         config.headers["content-type"] = "application/json"; // 默认类型
       }
@@ -93,11 +91,5 @@ instance.interceptors.response.use(
     return Promise.reject(message);
   }
 );
-
-
-// API方法封装
-export const fetchShowPopup = () => instance.get('/users')
-export const fetchCurrencies = () => instance.get('/currencies')
-export const convertCurrency = (userData) => instance.post('/convert', userData)
 
 export default instance

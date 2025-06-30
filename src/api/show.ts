@@ -1,4 +1,4 @@
-import axios from 'axios'
+import instance from './index'
 
 export interface showPopup {
   show: boolean,
@@ -9,7 +9,7 @@ export interface showPopup {
 }
 
 export const fetchShowPopup = async (): Promise<showPopup[]> => {
-  const response = await axios.get('/show/showPop')
-  console.log(response.data.data);
-  return response.data.data
+  const response = await instance.get('/showPop')
+  console.log(response.data);
+  return response.data
 }

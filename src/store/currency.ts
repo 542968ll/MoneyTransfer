@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
-import {  fetchCurrencies, convertCurrency } from '../api/currency'
-
+import { fetchCurrencies, convertCurrency } from "../api/currency";
 export interface Currency {
     id: string
     name: string
@@ -20,7 +19,6 @@ export const useCurrencyStore = defineStore('currency', {
       this.error = null
       try {
         this.currencies = await fetchCurrencies()
-        console.log(this.currencies);
       } catch (err) {
         this.error = 'Failed to load currencies'
       } finally {

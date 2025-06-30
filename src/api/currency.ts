@@ -1,4 +1,4 @@
-import axios from 'axios'
+import instance from './index'
 
 export interface Currency {
   id: string
@@ -14,7 +14,8 @@ export interface ConversionResult {
 }
 
 export const fetchCurrencies = async (): Promise<Currency[]> => {
-  const response = await axios.get('/api/currencies')
+  const response = await instance.get('/currencies')
+  console.log(response.data.data)
   return response.data.data
 }
 
@@ -23,6 +24,7 @@ export const convertCurrency = async (
   to: string, 
   amount: number
 ): Promise<ConversionResult> => {
-  const response = await axios.post('/api/convert', { from, to, amount })
+  const response = await instance.post('/convert', { from, to, amount })
+  console.log("1313131", response)
   return response.data.data
 }

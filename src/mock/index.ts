@@ -3,7 +3,7 @@ import Mock from 'mockjs'
 import showPop from './json/showPop.json'
 
 // 模拟返回弹窗内容
-Mock.mock('/show/showPop', 'get', showPop)
+Mock.mock('/api/showPop', 'get', showPop)
 
 // 模拟货币列表
 Mock.mock('/api/currencies', 'get', {
@@ -42,8 +42,8 @@ Mock.mock('/api/convert', 'post', function(options: any) {
     'MOP': 8.09,
   }
     
-  const fromRate = mockRates[from] || Mock.mock('@float(0.5, 2, 2, 2)')
-  const toRate = mockRates[to] || Mock.mock('@float(0.5, 2, 2, 2)')
+  const fromRate = mockRates[from]
+  const toRate = mockRates[to]
   
   return {
     data: {

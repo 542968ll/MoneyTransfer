@@ -107,12 +107,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import showToast from './TransferCpns/showToast.vue'
 import showPopup from './TransferCpns/showPopup.vue'
 import { useCurrencyStore } from "../store/currency"
 import { useShowPopupStore } from "../store/showPopup";
-import { computed } from '@vue/reactivity';
+
 
 let showPopupData = ref(false)
 let showobj = reactive({
