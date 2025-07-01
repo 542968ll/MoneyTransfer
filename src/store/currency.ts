@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
 import { fetchCurrencies, convertCurrency } from "../api/currency";
 export interface Currency {
-    id: string
-    name: string
-    image?: string
-  }
+  id: string
+  name: string
+  image?: string
+}
 
 export const useCurrencyStore = defineStore('currency', {
   state: () => ({
@@ -25,10 +25,10 @@ export const useCurrencyStore = defineStore('currency', {
         this.loading = false
       }
     },
-    
-    async convert(from: string, to: string, amount: number) {
+
+    async convert() {
       try {
-        return await convertCurrency(from, to, amount)
+        return await convertCurrency()
       } catch (err) {
         this.error = 'Conversion failed'
         throw err
@@ -37,8 +37,6 @@ export const useCurrencyStore = defineStore('currency', {
   },
   
   getters: {
-    currencyCodes: (state) => state.currencies.map(c => c.code),
-    getCurrencyByCode: (state) => (code: string) => 
-      state.currencies.find(c => c.code === code)
+
   }
 })

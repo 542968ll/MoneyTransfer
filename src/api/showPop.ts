@@ -1,4 +1,4 @@
-import instance from './index'
+import request from '../api/request'
 
 export interface showPopup {
   show: boolean,
@@ -9,7 +9,6 @@ export interface showPopup {
 }
 
 export const fetchShowPopup = async (): Promise<showPopup[]> => {
-  const response = await instance.get('/showPop')
-  console.log(response.data);
+  const response = await request.get('/showPop')
   return response.data
 }

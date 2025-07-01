@@ -1,4 +1,4 @@
-import instance from './index'
+import request from '../api/request'
 
 export interface Currency {
   id: string
@@ -7,24 +7,16 @@ export interface Currency {
 }
 
 export interface ConversionResult {
-  from: string
-  to: string
-  amount: number
-  result: string
+  result: Object
 }
 
 export const fetchCurrencies = async (): Promise<Currency[]> => {
-  const response = await instance.get('/currencies')
-  console.log(response.data.data)
+  const response = await request.get('/currencies')
   return response.data.data
 }
 
-export const convertCurrency = async (
-  from: string, 
-  to: string, 
-  amount: number
-): Promise<ConversionResult> => {
-  const response = await instance.post('/convert', { from, to, amount })
-  console.log("1313131", response)
-  return response.data.data
+export const convertCurrency = async (): Promise<ConversionResult> => {
+  const response = await request.get('/convert')
+  console.log(response.data.data[0]);
+  return response.data.data[0]
 }

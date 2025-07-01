@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { fetchShowPopup } from '../api/show'
+import { fetchShowPopup } from '../api/showPop'
 
 interface showPopup {
   show: boolean,
@@ -27,6 +27,5 @@ export const useShowPopupStore = defineStore('showpop', {
   },
   
   getters: {
-    // showPopObj: (state)
   }
 })

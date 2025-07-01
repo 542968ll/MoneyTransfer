@@ -4,15 +4,15 @@ import tailwindcss from '@tailwindcss/vite'
 import { viteMockServe } from "vite-plugin-mock";
 import path from 'path'
 
-// https://vite.dev/config/
+// {
+//   mockPath: "./mock/", // mock数据存放的文件夹
+//   localEnabled: true, // 是否在开发环境下启用 mock
+// }
 export default defineConfig({
   plugins: [
     vue(),
     tailwindcss(),
-    viteMockServe({
-      mockPath: "./mock/", // mock数据存放的文件夹
-      localEnabled: true, // 是否在开发环境下启用 mock
-    }),
+    viteMockServe(),
   ],
   resolve: {
     alias: {
@@ -22,12 +22,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8080', // 代理目标
+        target: 'http://localhost:3000/', // 代理目标
         changeOrigin: true,
-        pathRewrite: {
-          '^/api': '/mock'
-        }
-        // rewrite: (path) => path.replace(/^\/api/, '')
+        rewrite: (path) => path.replace(/^\/api/, "")
       }
     }
   }

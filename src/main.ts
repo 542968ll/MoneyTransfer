@@ -8,6 +8,7 @@ import { createPinia } from 'pinia';
 import "./mock/index.ts";
 import { Button, Notify, Field, Popup } from 'vant';
 
+
 const pinia = createPinia()
 
 createApp(App)

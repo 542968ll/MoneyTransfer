@@ -7,32 +7,52 @@
     <div class="m-[10px] h-[300px] rounded-[20px] bg-[#1989fa] flex flex-col justify-between">
       <!-- 选择货币&显示金额 transfer-front -->
       <!-- [&>*]: -->
-      <div class="p-[15px]
-        transfer-front
-      ">
+      <div class="p-[15px]">
         <!-- 选择框 -->
-        <select name="Money" v-model="from" @change="handleSubmit()">
+        <select name="Money" v-model="from" @change="handleSubmit()"
+          class="
+            w-[140px]          
+            h-[40px]
+            mr-[10px]
+            rounded-[10px] 
+          "
+        >
           <option value="USD">USD</option>
         </select>
-        <input type="text" placeholder="Amount" v-model="amount" @input="handleSubmit()">
+        <input type="text" placeholder="Amount" 
+          v-model="amount" 
+          @input="handleSubmit()"
+          class="
+            w-[170px]
+            h-[40px]
+            rounded-[10px]
+            border-0
+          "
+        >
       </div>
-
       <!-- transfer-middle -->
       <div class="flex flex-col justify-center py-[0px] px-[15px] -mt-[40px]">
         <!-- 有个判断需alert -->
-        <!-- transfer-middle-alert -->
-        <!-- mt-6 bg-black text-white p-1 -->
         <div v-if="showAlert" class="
           mt-[25px]
           bg-[#000]
           text-[#fff]
           p-[5px]
-          rounded-tl-['10px']
+          rounded-l-[10px]
           before:content-['*']
-          before:text-['red']
+          before:text-red
           before:pr-[3px]
         ">Insufficient funds.</div>
-        <div v-if="showLimitAlert" class="transfer-middle-alert">Amount exceeds limit.</div>
+        <div v-if="showLimitAlert" class="
+            mt-[25px]
+            bg-[#000]
+            text-[#fff]
+            p-[5px]
+            rounded-l-[10px]
+            before:content-['*']
+            before:text-red
+            before:pr-[3px]
+          ">Amount exceeds limit.</div>
         <!-- 显示available -->
         <div class="text-[#fff]">
           <p>Available:</p>
@@ -55,12 +75,17 @@
         </div>
       </div>
 
-      <!-- 选择货币&显示金额 -->
-      <div class="p-[15px]
-        transfer-behind
+      <!-- 选择货币&显示金额 transfer-behind-->
+      <div class="
+        p-[15px]        
       ">
         <!-- 选择框 -->
-        <select name="Money" @change="handleSubmit()" v-model="to">
+        <select name="Money" @change="handleSubmit()" v-model="to" class="
+            w-[140px]          
+            h-[40px]
+            mr-[10px]
+            rounded-[10px] 
+          ">
           <option value="USD">USD</option>
           <option value="CNY">CNY</option>
           <option value="HKD">HKD</option>
@@ -68,16 +93,21 @@
           <option value="JPY">JPY</option>
           <option value="MOP">MOP</option>
         </select>
-        <input type="text" placeholder="Amount" v-model="result">
+        <input type="text" placeholder="Amount" v-model="result"
+          class="
+            w-[170px]
+            h-[40px]
+            rounded-[10px]
+            border-0
+          "
+        >
       </div>
     </div>
 
     <!-- 确认按钮 bottombut -->
     <div class="text-center fixed w-full bottom-[15px]">
       <!-- bottombut-inner -->
-      <van-button 
-        class="rounded-2xl w-10/12 shadow-[0_5px_5px_1px_#cbcbcb]" 
-        type="primary" 
+      <van-button class="rounded-2xl w-10/12 shadow-[0_5px_5px_1px_#cbcbcb]" type="primary"
         @click="confirmShowPop">Comfrim
       </van-button>
     </div>
@@ -86,14 +116,36 @@
     <showPopup v-model="showPopupData" :showobj="showobj"></showPopup>
 
     <!-- 蒙版alert transfer-container-alert-->
-    <div class="bg-[#1989fa]-[0.6] w-full absolute h-full" v-if="false">
+    <div v-if="false" class="
+        bg-[rgba(255,255,255,0.6)]  
+        w-full 
+        absolute 
+        h-full">
       <!-- 显示错误 | 正确提示 transfer-container-alert-container -->
       <template v-if="false">
-        <div class="bg-black p-1.5 text-white mt-20 ml-20">
-          <span class="iconfont right">&#xe8e4;</span>
+        <div class="
+            bg-black 
+            p-[5px] 
+            text-[#fff] 
+            mt-[80px] 
+            ml-[20px]
+          ">
+          <span class="
+            iconfont right
+            text-[#3dc55d]
+            mr-[8px]
+            ">&#xe8e4;</span>
           <span>Modified successfully.</span>
         </div>
-        <div class="transfer-container-alert-container">
+        <!-- transfer-container-alert-container         -->
+        <div class="
+            bg-black
+            p-[5px]
+            text-white
+            mt-[80px]
+            ml-[80px]
+            rounded-l-[10px]                                    
+          ">
           <span class="iconfont fault">&#xe8e7;</span>
           <span>Modified failed.</span>
         </div>
@@ -112,6 +164,7 @@ import showToast from './TransferCpns/showToast.vue'
 import showPopup from './TransferCpns/showPopup.vue'
 import { useCurrencyStore } from "../store/currency"
 import { useShowPopupStore } from "../store/showPopup";
+import { convertFun } from '../utils/convert'
 
 
 let showPopupData = ref(false)
@@ -133,8 +186,7 @@ let amountLimit = ref(1)
 const currencyStore = useCurrencyStore()
 const showStore = useShowPopupStore()
 
-
-const showAlert = computed(()=> {
+const showAlert = computed(() => {
   return amount.value > available.value
 })
 const showLimitAlert = computed(() => {
@@ -143,37 +195,33 @@ const showLimitAlert = computed(() => {
 
 const handleSubmit = async () => {
   try {
-    const conversion = await currencyStore.convert(
-      from.value, 
-      to.value, 
-      amount.value
-    )
-    result.value = conversion.result
-  } finally { }
+    const conversion = await currencyStore.convert()
+    const res = convertFun(from.value, to.value, amount.value, conversion)
+    console.log('res', res);
+    
+    result.value = res.result
+  } catch {
+    console.log("Data loading failed");
+  }
 }
 
 const confirmShowPop = async () => {
   try {
     const showList = await showStore.showPopupList()
-    showobj = showList.filter(item => item.show === true)[0]
-    showPopupData.value = showList.filter(item => item.show === true)[0].show
-    return showList
+    showobj = showList.data.filter(item => item.show === true)[0]
+    showPopupData.value = showList.data.filter(item => item.show === true)[0].show
   } finally { }
 }
 
-
 const transferBut = () => {
-  // console.log("66666666");
-  // [from.value, to.value] = [to.value, from.value]
-  // console.log(from.value, to.value);
   alert("暂不支持转换功能~")
+  // [from.value, to.value] = [to.value, from.value];
+  // [amount.value, result.value] = [result.value, amount.value];
+  // console.log(from.value, to.value);
+  // console.log(amount.value, to.value);
+  // console.log("暂不支持转换功能~");
   
-  // [amount.value, result.value] = [result.value, amount.value]
 }
-
-
-
-
 
 // 按确认展示提示
 function showTip() {
@@ -341,11 +389,13 @@ function showTip() {
   box-shadow: 0 5px 5px 1px #cbcbcb;
   padding: 0;
 }
+
 .popup-containter-inner {
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 .popup-containter-inner-header {
   display: flex;
   flex-direction: column;
@@ -353,10 +403,12 @@ function showTip() {
   align-items: center;
   margin-top: 20px;
 }
+
 .popup-containter-inner-img {
   width: 94px;
   height: 94px;
 }
+
 .popup-containter-but {
   bottom: 25px;
   position: fixed;
@@ -367,11 +419,13 @@ function showTip() {
   color: #fff;
   box-shadow: 0 5px 5px 1px #d6d6d6;
 }
+
 .popup-containter-inner-title {
   font-size: 25px;
   margin-top: 10px;
   margin-bottom: 10px;
 }
+
 .van-overlay {
   background: rgba(0, 0, 0, 0);
 }

@@ -19,6 +19,7 @@
     "@vitejs/plugin-vue": "^6.0.0",
     "@vue/tsconfig": "^0.7.0",
     "axios": "^1.10.0",
+    "axios-mock-adapter": "^2.1.0",
     "pinia": "^3.0.3",
     "sass-embedded": "^1.89.2",
     "typescript": "~5.8.3",
