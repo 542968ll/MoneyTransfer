@@ -1,22 +1,16 @@
 import request from '../api/request'
+import type { CurrencySymbol } from '../types/currency'
 
-export interface Currency {
-  id: string
-  name: string
-  image?: string
+// 获取货币列表
+export const fetchCurrencies = async (): Promise<CurrencySymbol[]> => {
+  const response = await request.get('/api/currencies')
+  return response.data
 }
 
-export interface ConversionResult {
-  result: Object
+// 获取汇率
+export const getExchangeRate = async (from: string, to: string): Promise<any> => {
+  const response = await request.get('/api/exchangeRate', { params: { from, to } })
+  return response
 }
 
-export const fetchCurrencies = async (): Promise<Currency[]> => {
-  const response = await request.get('/currencies')
-  return response.data.data
-}
 
-export const convertCurrency = async (): Promise<ConversionResult> => {
-  const response = await request.get('/convert')
-  console.log(response.data.data[0]);
-  return response.data.data[0]
-}

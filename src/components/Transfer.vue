@@ -1,15 +1,15 @@
 <template>
-  <!-- transfer-container -->
   <div class="flex flex-col">
-    <!-- 标题 transfer-title -->
+    <!-- 标题 -->
     <div class="fontSize-[23px] font-normal mx-[10px] mt-[10px] mb-[0px]">Convert</div>
-    <!-- 转换窗口 transfer-window -->
+    <!-- 转换窗口 -->
     <div class="m-[10px] h-[300px] rounded-[20px] bg-[#1989fa] flex flex-col justify-between">
-      <!-- 选择货币&显示金额 transfer-front -->
-      <!-- [&>*]: -->
+      <!-- 选择货币&显示金额 -->
       <div class="p-[15px]">
         <!-- 选择框 -->
-        <select name="Money" v-model="from" @change="handleSubmit()"
+        <select 
+          name="Money" 
+          v-model="from"
           class="
             w-[140px]          
             h-[40px]
@@ -17,7 +17,11 @@
             rounded-[10px] 
           "
         >
-          <option value="USD">USD</option>
+          <option v-for="option in currencies" 
+            :value="option.code"
+            :key="option.code"
+            >{{ option.code }}
+          </option>
         </select>
         <input type="text" placeholder="Amount" 
           v-model="amount" 
@@ -30,7 +34,6 @@
           "
         >
       </div>
-      <!-- transfer-middle -->
       <div class="flex flex-col justify-center py-[0px] px-[15px] -mt-[40px]">
         <!-- 有个判断需alert -->
         <div v-if="showAlert" class="
@@ -58,7 +61,7 @@
           <p>Available:</p>
           <p>{{ available }}</p>
         </div>
-        <!-- 交换上下文 transfer-div -->
+        <!-- 交换上下文 -->
         <div class="
           w-[100px]
           h-[100px]
@@ -75,7 +78,7 @@
         </div>
       </div>
 
-      <!-- 选择货币&显示金额 transfer-behind-->
+      <!-- 选择货币&显示金额 -->
       <div class="
         p-[15px]        
       ">
@@ -86,12 +89,7 @@
             mr-[10px]
             rounded-[10px] 
           ">
-          <option value="USD">USD</option>
-          <option value="CNY">CNY</option>
-          <option value="HKD">HKD</option>
-          <option value="EUR">EUR</option>
-          <option value="JPY">JPY</option>
-          <option value="MOP">MOP</option>
+          <option v-for="option in currencies" :value="option.code">{{ option.code }}</option>
         </select>
         <input type="text" placeholder="Amount" v-model="result"
           class="
@@ -104,9 +102,8 @@
       </div>
     </div>
 
-    <!-- 确认按钮 bottombut -->
+    <!-- 确认按钮 -->
     <div class="text-center fixed w-full bottom-[15px]">
-      <!-- bottombut-inner -->
       <van-button class="rounded-2xl w-10/12 shadow-[0_5px_5px_1px_#cbcbcb]" type="primary"
         @click="confirmShowPop">Comfrim
       </van-button>
@@ -115,7 +112,7 @@
     <!-- 展示弹出层 -->
     <showPopup v-model="showPopupData" :showobj="showobj"></showPopup>
 
-    <!-- 蒙版alert transfer-container-alert-->
+    <!-- 蒙版alert -->
     <div v-if="false" class="
         bg-[rgba(255,255,255,0.6)]  
         w-full 
@@ -162,28 +159,32 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import showToast from './TransferCpns/showToast.vue'
 import showPopup from './TransferCpns/showPopup.vue'
-import { useCurrencyStore } from "../store/currency"
 import { useShowPopupStore } from "../store/showPopup";
 import { convertFun } from '../utils/convert'
+import { fetchCurrencies, getExchangeRate } from "../api/currency";
+import type { showPop } from '../types/showPopup';
+import type { CurrencySymbol } from "../types/currency";
 
 
 let showPopupData = ref(false)
 let showobj = reactive({
   "show": true,
-  "img": "../../assets/image/fadai.svg",
-  "title": "Convert Failed!",
-  "text": "Incorrect trade password.",
-  "but": "Try Again"
+  "img": "../../assets/image/guzhang.svg",
+  "title": "Convert Successfully!",
+  "text": "You have converted 0.01 BTC to 1.234 ETH,please review soon.",
+  "but": "Review"
 })
 
 let amount = ref(1)
 let from = ref("USD")
 let to = ref("CNY")
-let result = ref(6.45)
+let result: any = ref(6.45)
 let available = ref(100.0121)
 let amountLimit = ref(1)
 
-const currencyStore = useCurrencyStore()
+let currencies = reactive<CurrencySymbol[]>([])
+let showList = reactive<showPop[]>([])
+
 const showStore = useShowPopupStore()
 
 const showAlert = computed(() => {
@@ -193,24 +194,40 @@ const showLimitAlert = computed(() => {
   return amount.value < amountLimit.value
 })
 
+
+onMounted(async () => {
+  const res2 = await fetchCurrencies()
+  console.log("res2", res2);
+  
+  currencies = res2
+})
+
+
 const handleSubmit = async () => {
-  try {
-    const conversion = await currencyStore.convert()
-    const res = convertFun(from.value, to.value, amount.value, conversion)
-    console.log('res', res);
-    
-    result.value = res.result
-  } catch {
-    console.log("Data loading failed");
+  // 获得来自from汇率，进行转换
+  const res = await getExchangeRate('USD', to.value)
+  if(res.code === 200 && !showAlert.value && !showLimitAlert.value) {
+    try {
+      showList = await showStore.showPopupList()
+      console.log("showList", showList[0]);
+      
+      showobj = showList[0]
+      showPopupData.value = showobj.show
+      console.log("showobj", showobj);
+    } finally { }
   }
+  const convertResult = convertFun(from.value, to.value, amount.value, res.data.mockExchangeRates[0])  
+  result.value = convertResult.result
 }
 
 const confirmShowPop = async () => {
-  try {
-    const showList = await showStore.showPopupList()
-    showobj = showList.data.filter(item => item.show === true)[0]
-    showPopupData.value = showList.data.filter(item => item.show === true)[0].show
-  } finally { }
+  console.log("点击确认~");
+  
+  // try {
+  //   const showList = await showStore.showPopupList()
+  //   showobj = showList.data.filter(item => item.show === true)[0]
+  //   showPopupData.value = showList.data.filter(item => item.show === true)[0].show
+  // } finally { }
 }
 
 const transferBut = () => {
@@ -220,12 +237,6 @@ const transferBut = () => {
   // console.log(from.value, to.value);
   // console.log(amount.value, to.value);
   // console.log("暂不支持转换功能~");
-  
-}
-
-// 按确认展示提示
-function showTip() {
-  // showAlert.value = !showAlert.value
 }
 
 

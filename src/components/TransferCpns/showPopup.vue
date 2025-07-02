@@ -1,17 +1,51 @@
 <template>
   <div>
+    <!-- popup-containter -->
     <van-popup
       v-model:show="showModel"
-      class="popup-containter"
+      class="
+        bottom-[0px]
+        text-center
+        w-auto
+        translate-y-0
+        shadow-[0_5px_5px_1px_rgba(203,203,203,1.00)]
+        p-0
+      "
     >
-      <div class="popup-containter-inner">
-        <div class="popup-containter-inner-header">
-          <img class="popup-containter-inner-img" :src="image">
-          <span class="popup-containter-inner-title">{{ title }}</span>
-          <span class="popup-containter-inner-text">{{ text }}</span>
+      <div class="
+        flex
+        justify-center
+        items-center
+      ">
+        <div class="
+          flex
+          justify-center
+          items-center
+          flex-col
+          mt-[20px]
+        ">
+          <img class="
+            w-[94px]
+            h-[94px]
+          " :src="image">
+          <span class="
+            text-[25px]
+            mt-[10px]
+            mb-[10px]
+          ">{{ title }}</span>
+          <span>{{ text }}</span>
         </div>
         <div 
-          class="popup-containter-but"
+          class="
+            bottom-[25px]
+            fixed
+            w-[65%]
+            p-[10px]
+            rounded-[10px]
+            bg-[#1989fa]
+            text-[#fff]
+            shadow-[0_5px_5px_1px_rgba(214,214,214,1.00)]
+          "
           @click="hidePopup"
         >{{ but }}</div>
       </div>

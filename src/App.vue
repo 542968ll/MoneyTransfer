@@ -5,9 +5,8 @@ import Transfer from './components/Transfer.vue';
 
 <template>
   <Transfer></Transfer>
+
 </template>
-
-
 
 
 <style scoped>

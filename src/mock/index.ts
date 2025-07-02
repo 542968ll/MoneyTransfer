@@ -1,20 +1,75 @@
-// 引入 mock.js
-import Mock from 'mockjs'
-import showPop from './json/showPop.json'
-import currencies from './json/currencies.json'
-import rates from './json/rates.json'
+const currencies = () => {
+  return [
+    // 模拟货币列表
+    { code: 'USD', name: 'US Dollar', symbol: '$' },
+    { code: 'CNY', name: 'Chinese Yuan', symbol: '¥' },
+    { code: 'EUR', name: 'Euro', symbol: '€' },
+    { code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
+    { code: 'MOP', name: 'British Pound', symbol: '£' },
+  ]
+}
 
-// 模拟返回弹窗内容
-Mock.mock('/showPop', 'get', showPop)
+const showPop = () => {
+  return [
+    {
+      "show": true,
+      "img": "../../assets/image/guzhang.svg",
+      "title": "Convert Successfully!",
+      "text": "You have converted 0.01 BTC to 1.234 ETH,please review soon.",
+      "but": "Review"
+    }
+  ]
+}
 
-// 模拟货币列表
-Mock.mock('/currencies', 'get', currencies)
+// 模拟的货币汇率数据[from是USD]
+const mockExchangeRates = [
+  {
+    "USD": 1,
+    "EUR": 0.85,
+    "JPY": 110.15,
+    "CNY": 6.45,
+    "HKD": 7.85,
+    "MOP": 8.09
+  }
+]
 
-// 拿到usd的相对其他的汇率
-Mock.mock('/convert', 'get', rates)
-
-
-
-// 模拟汇率转换
-// Mock.mock('/convert', 'post', convertFun)
+export default [
+  // 获取货币列表接口
+  {
+    url: '/api/currencies',
+    method: 'get',
+    response: () => {
+      return {
+        code: 200,
+        data: currencies,
+        message: 'success'
+      }
+    }
+  }, {
+    // 获取弹窗内容接口
+    url: '/api/showPop',
+    method: 'get',
+    response: () => {
+      return {
+        code: 200,
+        data: {
+          showPop
+        }
+      }
+    }
+  }, {
+    // 获取汇率接口
+    url: '/api/exchangeRate',
+    method: 'get',
+    response: () => {
+      return {
+        code: 200,
+        data: {
+          mockExchangeRates
+        },
+        message: '获取成功'
+      }
+    }
+  }
+]
 

@@ -1,5 +1,5 @@
 
-export function convertFun(from, to, amount, mockRates) {
+export function convertFun(from: string, to: string, amount: number, mockRates: any) {
   const fromRate = mockRates[from]
   const toRate = mockRates[to]
 
