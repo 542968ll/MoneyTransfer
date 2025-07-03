@@ -11,20 +11,20 @@
           name="Money" 
           v-model="from"
           class="
-            w-[140px]          
+            w-[140px]
             h-[40px]
             mr-[10px]
             rounded-[10px] 
           "
         >
           <option v-for="option in currencies" 
-            :value="option.code"
-            :key="option.code"
-            >{{ option.code }}
+            :value="option.value"
+            :key="option.value"
+            >{{ option.value }}
           </option>
         </select>
-        <input type="text" placeholder="Amount" 
-          v-model="amount" 
+        <input type="number" placeholder="Amount" 
+          v-model="amount"
           @input="handleSubmit()"
           class="
             w-[170px]
@@ -43,7 +43,7 @@
           p-[5px]
           rounded-l-[10px]
           before:content-['*']
-          before:text-red
+          before:text-[#f00]
           before:pr-[3px]
         ">Insufficient funds.</div>
         <div v-if="showLimitAlert" class="
@@ -53,7 +53,7 @@
             p-[5px]
             rounded-l-[10px]
             before:content-['*']
-            before:text-red
+            before:text-[#f00]
             before:pr-[3px]
           ">Amount exceeds limit.</div>
         <!-- 显示available -->
@@ -77,11 +77,8 @@
           <img src="../assets/image/downArrow.svg" alt="" class="w-[40px] h-[40px] -ml-[10px]">
         </div>
       </div>
-
       <!-- 选择货币&显示金额 -->
-      <div class="
-        p-[15px]        
-      ">
+      <div class="p-[15px]">
         <!-- 选择框 -->
         <select name="Money" @change="handleSubmit()" v-model="to" class="
             w-[140px]          
@@ -89,9 +86,9 @@
             mr-[10px]
             rounded-[10px] 
           ">
-          <option v-for="option in currencies" :value="option.code">{{ option.code }}</option>
+          <option v-for="option in currencies" :value="option.value">{{ option.value }}</option>
         </select>
-        <input type="text" placeholder="Amount" v-model="result"
+        <input type="number" placeholder="Amount" v-model="result"
           class="
             w-[170px]
             h-[40px]
@@ -101,18 +98,15 @@
         >
       </div>
     </div>
-
     <!-- 确认按钮 -->
     <div class="text-center fixed w-full bottom-[15px]">
       <van-button class="rounded-2xl w-10/12 shadow-[0_5px_5px_1px_#cbcbcb]" type="primary"
-        @click="confirmShowPop">Comfrim
+        @click="confirmLogin">Comfrim
       </van-button>
     </div>
-
     <!-- 展示弹出层 -->
-    <showPopup v-model="showPopupData" :showobj="showobj"></showPopup>
-
-    <!-- 蒙版alert -->
+    <showPopup v-if="showPopupData" v-model="showPopupData" :showobj="showobj"></showPopup>
+    <!-- 蒙版alert  -->
     <div v-if="false" class="
         bg-[rgba(255,255,255,0.6)]  
         w-full 
@@ -134,7 +128,6 @@
             ">&#xe8e4;</span>
           <span>Modified successfully.</span>
         </div>
-        <!-- transfer-container-alert-container         -->
         <div class="
             bg-black
             p-[5px]
@@ -143,7 +136,10 @@
             ml-[80px]
             rounded-l-[10px]                                    
           ">
-          <span class="iconfont fault">&#xe8e7;</span>
+          <span class="iconfont
+            text-[#f00]
+            mr-[8px]
+          ">&#xe8e7;</span>
           <span>Modified failed.</span>
         </div>
       </template>
@@ -156,50 +152,49 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import showToast from './TransferCpns/showToast.vue'
 import showPopup from './TransferCpns/showPopup.vue'
 import { useShowPopupStore } from "../store/showPopup";
 import { convertFun } from '../utils/convert'
 import { fetchCurrencies, getExchangeRate } from "../api/currency";
+import { Login } from "../api/user"
 import type { showPop } from '../types/showPopup';
 import type { CurrencySymbol } from "../types/currency";
 
 
-let showPopupData = ref(false)
-let showobj = reactive({
-  "show": true,
-  "img": "../../assets/image/guzhang.svg",
-  "title": "Convert Successfully!",
-  "text": "You have converted 0.01 BTC to 1.234 ETH,please review soon.",
-  "but": "Review"
-})
+const showPopupData = ref<boolean>(false)
+// 类型断言，一开始赋值空，最后确定它肯定属于showPop类型
+const showobj = ref<showPop>({} as showPop)
 
-let amount = ref(1)
-let from = ref("USD")
-let to = ref("CNY")
-let result: any = ref(6.45)
-let available = ref(100.0121)
-let amountLimit = ref(1)
+const amount = ref<number>(1)
+const from = ref<string>("USD")
+const to = ref<string>("CNY")
 
-let currencies = reactive<CurrencySymbol[]>([])
-let showList = reactive<showPop[]>([])
+const result = ref<number>(6.45)
+const available = ref<number>(100.0121)
+const amountLimit = ref<number>(1)
+
+const currencies = ref<CurrencySymbol[]>([])
 
 const showStore = useShowPopupStore()
 
-const showAlert = computed(() => {
+const showAlert = computed<boolean>(() => {
   return amount.value > available.value
 })
-const showLimitAlert = computed(() => {
+const showLimitAlert = computed<boolean>(() => {
   return amount.value < amountLimit.value
 })
 
 
 onMounted(async () => {
-  const res2 = await fetchCurrencies()
-  console.log("res2", res2);
-  
-  currencies = res2
+  try{
+    const res2 = await fetchCurrencies()
+    currencies.value = res2
+    from.value = currencies.value[0]?.value
+  } catch (err) {
+    
+  }
 })
 
 
@@ -208,41 +203,32 @@ const handleSubmit = async () => {
   const res = await getExchangeRate('USD', to.value)
   if(res.code === 200 && !showAlert.value && !showLimitAlert.value) {
     try {
-      showList = await showStore.showPopupList()
-      console.log("showList", showList[0]);
-      
-      showobj = showList[0]
-      showPopupData.value = showobj.show
-      console.log("showobj", showobj);
+      const response = await showStore.showPopupList() || []
+      showobj.value = response[0]
+      showPopupData.value = showobj.value.show
     } finally { }
   }
   const convertResult = convertFun(from.value, to.value, amount.value, res.data.mockExchangeRates[0])  
+
   result.value = convertResult.result
 }
 
-const confirmShowPop = async () => {
-  console.log("点击确认~");
+
+const confirmLogin = async () => {
+  if(showAlert.value || showLimitAlert.value) return
+  console.log("点击登录~");
+  // 发起登录请求
   
-  // try {
-  //   const showList = await showStore.showPopupList()
-  //   showobj = showList.data.filter(item => item.show === true)[0]
-  //   showPopupData.value = showList.data.filter(item => item.show === true)[0].show
-  // } finally { }
 }
 
 const transferBut = () => {
-  alert("暂不支持转换功能~")
-  // [from.value, to.value] = [to.value, from.value];
-  // [amount.value, result.value] = [result.value, amount.value];
-  // console.log(from.value, to.value);
-  // console.log(amount.value, to.value);
-  // console.log("暂不支持转换功能~");
+  [from.value, to.value] = [to.value, from.value];
+  [amount.value, result.value] = [result.value, amount.value];
 }
 
 
 
 </script>
-
 
 
 <style scoped>

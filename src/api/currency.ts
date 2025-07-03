@@ -1,5 +1,5 @@
 import request from '../api/request'
-import type { CurrencySymbol } from '../types/currency'
+import type { CurrencySymbol, ExchangeRate } from '../types/currency'
 
 // 获取货币列表
 export const fetchCurrencies = async (): Promise<CurrencySymbol[]> => {
@@ -8,7 +8,7 @@ export const fetchCurrencies = async (): Promise<CurrencySymbol[]> => {
 }
 
 // 获取汇率
-export const getExchangeRate = async (from: string, to: string): Promise<any> => {
+export const getExchangeRate = async (from: string, to: string): Promise<ExchangeRate> => {
   const response = await request.get('/api/exchangeRate', { params: { from, to } })
   return response
 }

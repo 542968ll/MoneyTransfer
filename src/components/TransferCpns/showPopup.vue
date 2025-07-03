@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- popup-containter -->
     <van-popup
       v-model:show="showModel"
       class="
@@ -33,7 +32,10 @@
             mt-[10px]
             mb-[10px]
           ">{{ title }}</span>
-          <span>{{ text }}</span>
+          <span class="
+            text-[18px]
+          "
+          >{{ text }}</span>
         </div>
         <div 
           class="
@@ -55,15 +57,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, toRefs, onMounted, computed } from 'vue'
 
 const props = defineProps({
   showobj: {
     type: Object,
+    default: {}
   }
 })
-const { img, title, text, but } = props.showobj
+const { img, title, text, but } = props.showobj 
+console.log("props", props);
 
+console.log(img, title, text, but, '56565656')
 
 const image = new URL(img, import.meta.url).href
 

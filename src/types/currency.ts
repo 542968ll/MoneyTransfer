@@ -1,12 +1,16 @@
 export interface ExchangeRate {
-  code: number,
-  data: Object,
-  message: string
+  code?: number,
+  data: any,
+  message?: string
 }
   
 
 export interface CurrencySymbol {
-  code: string;
+  value: string;
   name: string;
   symbol: string;
+}
+
+export interface mockRatesObject {
+  [key: string]: number
 }
