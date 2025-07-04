@@ -5,8 +5,9 @@
       class="
         bottom-[0px]
         text-center
-        w-auto
-        translate-y-0
+        !w-full
+        !transform
+        !translate-y-0
         shadow-[0_5px_5px_1px_rgba(203,203,203,1.00)]
         p-0
       "

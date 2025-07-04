@@ -9,7 +9,7 @@ const currencies = () => {
   ]
 }
 
-// 模拟弹窗返回内容
+// 模拟弹窗返回内容[成功的]
 const showPop = () => {
   return [
     {
@@ -18,6 +18,19 @@ const showPop = () => {
       "title": "Convert Successfully!",
       "text": "You have converted 0.01 BTC to 1.234 ETH,please review soon.",
       "but": "Review"
+    }
+  ]
+}
+
+// 模拟弹窗返回内容[成功的]
+const showPopFailed = () => {
+  return [
+    {
+      "show": true,
+      "img": "../../assets/image/fadai.svg",
+      "title": "Convert Failed!",
+      "text": "Incorrect trade password.",
+      "but": "Try"
     }
   ]
 }
@@ -49,6 +62,13 @@ const userList = () => {
   }]
 }
 
+// 模拟转账数据
+const transferData = {
+  title: "Transfer Reminder",
+  content: "Elaine has sent you 100USDT,please review soon.",
+  money: 100
+}
+
 
 export default [
   // 获取货币列表接口
@@ -69,9 +89,9 @@ export default [
     response: () => {
       return {
         code: 200,
-        data: {
-          showPop
-        }
+        // data: {
+        //   showPop
+        // }
       }
     }
   }, {
@@ -103,7 +123,8 @@ export default [
         return {
           code: 201,
           data: {
-            message: '账号或者密码不正确'
+            message: '账号或者密码不正确',
+            showPopFailed
           }
         }
       }
@@ -112,10 +133,25 @@ export default [
       return {
         code: 200,
         data: {
-          token
+          token,
+          message: '登录成功',
+          showPop
         }
       }
     }
+  }, {
+     // 获取汇率接口
+     url: '/api/transfer',
+     method: 'post',
+     response: () => {
+       return {
+         code: 200,
+         data: {
+           transferData
+         },
+         message: '收入到账'
+       }
+     }
   }
 ]
 

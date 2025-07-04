@@ -1,5 +1,5 @@
 import request from '../api/request'
-import type { CurrencySymbol, ExchangeRate } from '../types/currency'
+import type { CurrencySymbol, ExchangeRate, mockTransferRemainder } from '../types/currency'
 
 // 获取货币列表
 export const fetchCurrencies = async (): Promise<CurrencySymbol[]> => {
@@ -13,4 +13,9 @@ export const getExchangeRate = async (from: string, to: string): Promise<Exchang
   return response
 }
 
+// 转出接口
+export const transfer = async (money: number): Promise<any> => {
+  const response = await request.post('/api/transfer', {money})
+  return response
+}
 

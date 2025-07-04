@@ -20,6 +20,9 @@
           <option v-for="option in currencies" 
             :value="option.value"
             :key="option.value"
+            class="
+              hover:bg-[#1989fa]
+            "
             >{{ option.value }}
           </option>
         </select>
@@ -98,18 +101,91 @@
         >
       </div>
     </div>
+
+    <button @click="transferFun(100)">Transfer</button>
+
     <!-- 确认按钮 -->
     <div class="text-center fixed w-full bottom-[15px]">
       <van-button class="rounded-2xl w-10/12 shadow-[0_5px_5px_1px_#cbcbcb]" type="primary"
-        @click="confirmLogin">Comfrim
+        @click="confirmLoginToast">Comfrim
       </van-button>
     </div>
+
+
+    <!-- 展示登录弹窗 -->
+    <div
+      class="
+        bg-[rgba(255,255,255,0.6)] 
+        w-full 
+        absolute 
+        h-full
+      "
+      v-if="showLoginToast"
+    >
+      <div
+        class="
+          w-[300px]
+          h-[200px]
+          flex
+          flex-col
+          items-center
+          justify-evenly
+          top-[50%]
+          left-[50%]
+          absolute
+          translate-x-[-50%]
+          translate-y-[-50%]
+          bg-[#d6d6d6]
+          rounded-[10px]
+        "
+      >
+        <div>
+          <span>用户名</span>
+          <input type="text" v-model="username">
+        </div>
+        <div>
+          <span>密  码</span>
+          <input type="password" v-model="password">
+        </div>
+        <div
+          class="
+            flex
+            items-center
+            justify-center
+          "
+        >
+          <button 
+            class="
+              mr-[15px]
+              w-[70px]
+              h-[30px]
+              bg-[#1989fa]
+              border-0
+              text-[#fff]
+              rounded-[5px]
+            "
+            @click="confirmLogin"
+          >登录</button>
+          <button 
+            class="
+              w-[70px]
+              h-[30px]
+              rounded-[5px]
+              border-0
+            "
+            @click="cacelLogin"
+          >取消</button>
+        </div>
+      </div>
+    </div>
+
+
     <!-- 展示弹出层 -->
     <showPopup v-if="showPopupData" v-model="showPopupData" :showobj="showobj"></showPopup>
     <!-- 蒙版alert  -->
-    <div v-if="false" class="
+    <div v-if="showTransToast" class="
         bg-[rgba(255,255,255,0.6)]  
-        w-full 
+        w-full
         absolute 
         h-full">
       <!-- 显示错误 | 正确提示 transfer-container-alert-container -->
@@ -144,7 +220,7 @@
         </div>
       </template>
       <!-- 显示弹窗 -->
-      <show-toast></show-toast>
+      <show-toast :transferData="transferData" @cancelToast="cancelToastFun"></show-toast>
     </div>
 
   </div>
@@ -155,12 +231,12 @@
 import { ref, onMounted, computed } from 'vue'
 import showToast from './TransferCpns/showToast.vue'
 import showPopup from './TransferCpns/showPopup.vue'
-import { useShowPopupStore } from "../store/showPopup";
 import { convertFun } from '../utils/convert'
-import { fetchCurrencies, getExchangeRate } from "../api/currency";
+import { fetchCurrencies, getExchangeRate, transfer } from "../api/currency";
 import { Login } from "../api/user"
+
 import type { showPop } from '../types/showPopup';
-import type { CurrencySymbol } from "../types/currency";
+import type { CurrencySymbol, mockTransferRemainder } from "../types/currency";
 
 
 const showPopupData = ref<boolean>(false)
@@ -177,7 +253,13 @@ const amountLimit = ref<number>(1)
 
 const currencies = ref<CurrencySymbol[]>([])
 
-const showStore = useShowPopupStore()
+const username = ref('')
+const password = ref('')
+const showLoginToast = ref(false)
+const showTransToast = ref(false)
+
+const transferData = ref<mockTransferRemainder>({} as mockTransferRemainder)
+
 
 const showAlert = computed<boolean>(() => {
   return amount.value > available.value
@@ -198,27 +280,61 @@ onMounted(async () => {
 })
 
 
+// 模拟transfer
+const transferFun = async (num: number) => {
+  try {
+    const res = await transfer(num)
+    
+    if(res.code === 200) {
+      showTransToast.value = true
+      transferData.value = res.data.transferData
+    }
+    console.log(res);
+  } catch (error) {
+    
+  }
+}
+
+const cancelToastFun = (res: boolean) => {
+  showTransToast.value = res
+}
+
 const handleSubmit = async () => {
   // 获得来自from汇率，进行转换
   const res = await getExchangeRate('USD', to.value)
-  if(res.code === 200 && !showAlert.value && !showLimitAlert.value) {
-    try {
-      const response = await showStore.showPopupList() || []
-      showobj.value = response[0]
-      showPopupData.value = showobj.value.show
-    } finally { }
-  }
   const convertResult = convertFun(from.value, to.value, amount.value, res.data.mockExchangeRates[0])  
-
   result.value = convertResult.result
 }
 
 
-const confirmLogin = async () => {
+const confirmLoginToast = async () => {
   if(showAlert.value || showLimitAlert.value) return
-  console.log("点击登录~");
+  // 弹出登录弹窗
+  showLoginToast.value = true
+}
+
+const confirmLogin = async () => {
   // 发起登录请求
-  
+  const response = await Login({username: username.value, password: password.value})
+  if(!response.token) {
+    console.log(response.message);
+    showLoginToast.value = false
+    showobj.value = response.showPopFailed[0]
+    showPopupData.value = showobj.value.show
+  } else {
+    console.log(response, "登录成功~");
+    showLoginToast.value = false
+    showobj.value = response.showPop[0]
+    showPopupData.value = showobj.value.show
+  }
+  username.value = ''
+  password.value = ''
+}
+
+const cacelLogin = () => {
+  showLoginToast.value = false
+  username.value = ''
+  password.value = ''
 }
 
 const transferBut = () => {

@@ -14,3 +14,9 @@ export interface CurrencySymbol {
 export interface mockRatesObject {
   [key: string]: number
 }
+
+export interface mockTransferRemainder {
+  title: string,
+  content: string,
+  money: number
+}
